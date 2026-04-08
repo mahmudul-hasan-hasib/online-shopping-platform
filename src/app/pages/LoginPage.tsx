@@ -1,25 +1,37 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+  const { login, register } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication - in real app, this would call an API
-    console.log('Form submitted:', { email, password, name });
-    // Redirect to home after "login"
-    navigate('/');
+
+    try {
+      if (isSignUp) {
+        await register({ name, email, password });
+      } else {
+        await login({ email, password });
+      }
+
+      navigate(from, { replace: true });
+    } catch (error) {
+      console.error('Authentication failed:', error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#eaeded] flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
             <div className="text-4xl font-bold">
@@ -29,17 +41,18 @@ export function LoginPage() {
           </Link>
         </div>
 
-        {/* Form Container */}
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
             {isSignUp ? 'Create account' : 'Sign in'}
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name Field (Sign Up Only) */}
             {isSignUp && (
               <div>
-                <label htmlFor="name" className="block text-sm font-bold text-gray-900 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-bold text-gray-900 mb-2"
+                >
                   Your name
                 </label>
                 <input
@@ -54,9 +67,11 @@ export function LoginPage() {
               </div>
             )}
 
-            {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-gray-900 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-bold text-gray-900 mb-2"
+              >
                 Email
               </label>
               <input
@@ -70,9 +85,11 @@ export function LoginPage() {
               />
             </div>
 
-            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-bold text-gray-900 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-bold text-gray-900 mb-2"
+              >
                 Password
               </label>
               <input
@@ -81,7 +98,9 @@ export function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                placeholder={isSignUp ? 'At least 6 characters' : 'Enter your password'}
+                placeholder={
+                  isSignUp ? 'At least 6 characters' : 'Enter your password'
+                }
                 required
                 minLength={6}
               />
@@ -92,7 +111,6 @@ export function LoginPage() {
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-md font-bold transition"
@@ -101,7 +119,6 @@ export function LoginPage() {
             </button>
           </form>
 
-          {/* Terms and Conditions (Sign Up Only) */}
           {isSignUp && (
             <p className="text-xs text-gray-600 mt-4">
               By creating an account, you agree to shop.com's{' '}
@@ -116,7 +133,6 @@ export function LoginPage() {
             </p>
           )}
 
-          {/* Forgot Password (Sign In Only) */}
           {!isSignUp && (
             <div className="mt-4">
               <a href="#" className="text-sm text-blue-600 hover:underline">
@@ -126,7 +142,6 @@ export function LoginPage() {
           )}
         </div>
 
-        {/* Toggle Between Sign In and Sign Up */}
         <div className="mt-6 text-center">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -143,11 +158,12 @@ export function LoginPage() {
             onClick={() => setIsSignUp(!isSignUp)}
             className="mt-4 w-full bg-white hover:bg-gray-50 text-gray-900 py-3 rounded-md font-bold border border-gray-300 transition"
           >
-            {isSignUp ? 'Sign in to your account' : 'Create your shop.com account'}
+            {isSignUp
+              ? 'Sign in to your account'
+              : 'Create your shop.com account'}
           </button>
         </div>
 
-        {/* Back to Home */}
         <div className="mt-6 text-center">
           <Link to="/" className="text-sm text-blue-600 hover:underline">
             ← Back to shop.com

@@ -1,16 +1,17 @@
 import { MapPin, Search, ShoppingCart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 export function Navbar() {
   const { getCartCount } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const cartCount = getCartCount();
 
   return (
     <nav className="bg-[#131921] text-white">
       <div className="flex items-center justify-between gap-6 px-6 py-3">
-        {/* Logo */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <div className="text-2xl font-bold px-3 py-2 hover:outline outline-1 outline-white rounded-sm cursor-pointer transition">
             <span className="text-white">shop</span>
@@ -18,7 +19,6 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Delivery Location */}
         <button className="flex items-center gap-1 px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition flex-shrink-0">
           <MapPin className="w-5 h-5" />
           <div className="flex flex-col items-start text-xs">
@@ -27,7 +27,6 @@ export function Navbar() {
           </div>
         </button>
 
-        {/* Search Bar - Larger and Better Aligned */}
         <div className="flex-1 flex items-stretch max-w-4xl">
           <select className="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-l-md border-none outline-none text-sm cursor-pointer hover:bg-gray-300 transition font-medium">
             <option>All</option>
@@ -46,26 +45,34 @@ export function Navbar() {
           </button>
         </div>
 
-        {/* Right Side Actions */}
         <div className="flex items-center gap-4 flex-shrink-0">
-          {/* Account & Lists */}
-          <button
-            onClick={() => navigate('/login')}
-            className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition"
-          >
-            <span className="text-xs text-gray-300">Hello, sign in</span>
-            <span className="text-sm font-bold flex items-center gap-1">
-              Account & Lists
-            </span>
-          </button>
+          <div className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition">
+            {isAuthenticated ? (
+              <>
+                <span className="text-xs text-gray-300">Hello, {user?.name}</span>
+                <button
+                  onClick={logout}
+                  className="text-sm font-bold text-left"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex flex-col items-start"
+              >
+                <span className="text-xs text-gray-300">Hello, sign in</span>
+                <span className="text-sm font-bold">Account & Lists</span>
+              </button>
+            )}
+          </div>
 
-          {/* Returns & Orders */}
           <button className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition">
             <span className="text-xs text-gray-300">Returns</span>
             <span className="text-sm font-bold">& Orders</span>
           </button>
 
-          {/* Cart */}
           <button
             onClick={() => navigate('/cart')}
             className="flex items-center gap-2 px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition relative"

@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { ProtectedRoute } from '../routes/ProtectedRoute';
 import { Layout } from './Layout';
 import { CartPage } from './pages/CartPage';
 import { Home } from './pages/Home';
@@ -15,7 +16,13 @@ export const router = createBrowserRouter([
       { path: 'products', Component: ProductListing },
       { path: 'products/:category', Component: ProductListing },
       { path: 'product/:id', Component: ProductDetails },
-      { path: 'cart', Component: CartPage },
+
+      {
+        Component: ProtectedRoute,
+        children: [
+          { path: 'cart', Component: CartPage },
+        ],
+      },
     ],
   },
   {
