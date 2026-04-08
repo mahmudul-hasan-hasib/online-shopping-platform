@@ -1,19 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  description: string;
-  rating: number;
-  reviews: number;
-}
-
-interface CartItem extends Product {
-  quantity: number;
-}
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import type { CartItem, Product } from '../../types/product';
 
 interface CartContextType {
   cart: CartItem[];
@@ -27,12 +13,30 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = 'shop-cart';
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+    if (!savedCart) return [];
+
+    try {
+      return JSON.parse(savedCart);
+    } catch (error) {
+      console.error('Failed to parse cart from localStorage:', error);
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
+
       if (existingItem) {
         return prevCart.map((item) =>
           item.id === product.id
@@ -40,6 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : item
         );
       }
+
       return [...prevCart, { ...product, quantity: 1 }];
     });
   };
@@ -53,6 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart(productId);
       return;
     }
+
     setCart((prevCart) =>
       prevCart.map((item) =>
         item.id === productId ? { ...item, quantity } : item
@@ -91,8 +97,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext);
+
   if (!context) {
     throw new Error('useCart must be used within CartProvider');
   }
+
   return context;
 }

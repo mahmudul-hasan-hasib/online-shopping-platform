@@ -1,31 +1,46 @@
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { getProducts } from '../../api/productApi';
+import type { Product } from '../../types/product';
 import { ProductCard } from '../components/ProductCard';
-import { products } from '../data/products';
 
 export function ProductListing() {
   const { category } = useParams();
+
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(category || '');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
 
-  // Update selected category when URL changes
   useEffect(() => {
-  setSelectedCategory(category || '');
-}, [category]);
+    setSelectedCategory(category || '');
+  }, [category]);
 
-  // Get unique categories and brands
-  const categories = ['All', ...Array.from(new Set(products.map((p) => p.category)))];
+ useEffect(() => {
+  const loadProducts = async () => {
+    const data = await getProducts();
+    setAllProducts(data);
+  };
+
+  loadProducts();
+}, []);
+
+  const categories = [
+    'All',
+    ...Array.from(new Set(allProducts.map((p) => p.category))),
+  ];
+
   const brands = Array.from(
-    new Set(products.map((p) => p.name.split(' ')[0]))
+    new Set(allProducts.map((p) => p.name.split(' ')[0]))
   ).slice(0, 8);
 
-  // Filter products
-  let filteredProducts = products;
+  let filteredProducts = allProducts;
 
   if (selectedCategory && selectedCategory !== 'All') {
-    filteredProducts = filteredProducts.filter((p) => p.category === selectedCategory);
+    filteredProducts = filteredProducts.filter(
+      (p) => p.category === selectedCategory
+    );
   }
 
   if (selectedBrands.length > 0) {
@@ -54,10 +69,8 @@ export function ProductListing() {
     <div className="min-h-screen bg-[#eaeded]">
       <div className="max-w-[1920px] mx-auto px-8 py-8">
         <div className="flex gap-6">
-          {/* Left Sidebar - Filters */}
           <aside className="w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-              {/* Filter Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-gray-700" />
@@ -71,7 +84,6 @@ export function ProductListing() {
                 </button>
               </div>
 
-              {/* Category Filter */}
               <div className="mb-6">
                 <h3 className="font-bold text-sm text-gray-900 mb-3">Category</h3>
                 <div className="space-y-2">
@@ -83,8 +95,13 @@ export function ProductListing() {
                       <input
                         type="radio"
                         name="category"
-                        checked={selectedCategory === cat || (!selectedCategory && cat === 'All')}
-                        onChange={() => setSelectedCategory(cat === 'All' ? '' : cat)}
+                        checked={
+                          selectedCategory === cat ||
+                          (!selectedCategory && cat === 'All')
+                        }
+                        onChange={() =>
+                          setSelectedCategory(cat === 'All' ? '' : cat)
+                        }
                         className="w-4 h-4 text-orange-400 cursor-pointer"
                       />
                       <span>{cat}</span>
@@ -95,7 +112,6 @@ export function ProductListing() {
 
               <hr className="my-4" />
 
-              {/* Brand Filter */}
               <div className="mb-6">
                 <h3 className="font-bold text-sm text-gray-900 mb-3">Brand</h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -118,7 +134,6 @@ export function ProductListing() {
 
               <hr className="my-4" />
 
-              {/* Price Range Filter */}
               <div className="mb-4">
                 <h3 className="font-bold text-sm text-gray-900 mb-3">Price Range</h3>
                 <div className="space-y-3">
@@ -162,9 +177,7 @@ export function ProductListing() {
             </div>
           </aside>
 
-          {/* Right Side - Product Grid */}
           <div className="flex-1">
-            {/* Page Header */}
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {selectedCategory || 'All Products'}
@@ -172,14 +185,12 @@ export function ProductListing() {
               <p className="text-gray-600">{filteredProducts.length} results</p>
             </div>
 
-            {/* Product Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
 
-            {/* Empty State */}
             {filteredProducts.length === 0 && (
               <div className="bg-white rounded-lg shadow-md p-12 text-center">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

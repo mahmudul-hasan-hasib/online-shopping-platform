@@ -1,7 +1,6 @@
-import { Product } from '../context/CartContext';
+import type { Product } from '../../types/product';
 
 export const products: Product[] = [
-  // Electronics
   {
     id: 'elec-1',
     name: 'Wireless Laptop Pro 15"',
@@ -42,7 +41,6 @@ export const products: Product[] = [
     rating: 4.4,
     reviews: 423,
   },
-  // Fashion
   {
     id: 'fashion-1',
     name: 'Premium Leather Jacket',
@@ -83,7 +81,6 @@ export const products: Product[] = [
     rating: 4.4,
     reviews: 456,
   },
-  // Home
   {
     id: 'home-1',
     name: 'Modern Coffee Table',
@@ -124,7 +121,6 @@ export const products: Product[] = [
     rating: 4.6,
     reviews: 289,
   },
-  // Sports
   {
     id: 'sports-1',
     name: 'Yoga Mat Premium',

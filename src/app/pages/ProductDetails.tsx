@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { products } from '../data/products';
 
+
 export function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();

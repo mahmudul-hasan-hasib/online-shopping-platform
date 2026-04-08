@@ -1,5 +1,4 @@
-/* Tailwind CSS v4 configuration - TypeScript errors are false positives */
-@import 'tailwindcss' source(none);
-@source '../**/*.{js,ts,jsx,tsx}';
+/* Tailwind CSS v4 configuration */
+@import 'tailwindcss';
 
 @import 'tw-animate-css';
