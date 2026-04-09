@@ -5,6 +5,7 @@ import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { Home } from './pages/Home';
 import { LoginPage } from './pages/LoginPage';
+import { OrderSuccessPage } from './pages/OrderSuccessPage';
 import { ProductDetails } from './pages/ProductDetails';
 import { ProductListing } from './pages/ProductListing';
 
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'cart', Component: CartPage },
           { path: 'checkout', Component: CheckoutPage },
+          { path: 'order-success', Component: OrderSuccessPage },
         ],
       },
     ],

@@ -47,8 +47,7 @@ export function CheckoutPage() {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       clearCart();
-      alert('Order placed successfully!');
-      navigate('/');
+      navigate('/order-success');
     } catch (error) {
       console.error('Failed to place order:', error);
       alert('Something went wrong while placing the order.');
