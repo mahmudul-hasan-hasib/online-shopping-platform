@@ -6,39 +6,43 @@ export function Home() {
   const categories = [
     {
       title: 'Electronics & Gadgets',
-      imageUrl: 'https://images.unsplash.com/photo-1680585499966-d73b4f54f127?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVjdHJvbmljcyUyMGdhZGdldHMlMjBsYXB0b3B8ZW58MXx8fHwxNzczODM5NzgyfDA&ixlib=rb-4.1.0&q=80&w=1080',
+      imageUrl:
+        'https://images.unsplash.com/photo-1680585499966-d73b4f54f127?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVjdHJvbmljcyUyMGdhZGdldHMlMjBsYXB0b3B8ZW58MXx8fHwxNzczODM5NzgyfDA&ixlib=rb-4.1.0&q=80&w=1080',
       label: 'Up to 40% OFF',
-      category: 'Electronics',
+      category: 'electronics',
     },
     {
       title: 'Fashion Trends',
-      imageUrl: 'https://images.unsplash.com/photo-1763771522867-c26bf75f12bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmclMjBhcHBhcmVsfGVufDF8fHx8MTc3MzgxMDUyM3ww&ixlib=rb-4.1.0&q=80&w=1080',
+      imageUrl:
+        'https://images.unsplash.com/photo-1763771522867-c26bf75f12bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmclMjBhcHBhcmVsfGVufDF8fHx8MTc3MzgxMDUyM3ww&ixlib=rb-4.1.0&q=80&w=1080',
       label: 'NEW ARRIVALS',
-      category: 'Fashion',
+      category: 'fashion',
     },
     {
       title: 'Home & Living',
-      imageUrl: 'https://images.unsplash.com/photo-1702865071803-cb154cd45f48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob21lJTIwZnVybml0dXJlJTIwZGVjb3J8ZW58MXx8fHwxNzczODM3NjQ0fDA&ixlib=rb-4.1.0&q=80&w=1080',
+      imageUrl:
+        'https://images.unsplash.com/photo-1702865071803-cb154cd45f48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob21lJTIwZnVybml0dXJlJTIwZGVjb3J8ZW58MXx8fHwxNzczODM3NjQ0fDA&ixlib=rb-4.1.0&q=80&w=1080',
       label: 'TOP RATED',
-      category: 'Home',
+      category: 'home',
     },
     {
       title: 'Sports & Fitness',
-      imageUrl: 'https://images.unsplash.com/photo-1758875568468-194dfe762ba9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBmaXRuZXNzJTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzgwODExMHww&ixlib=rb-4.1.0&q=80&w=1080',
+      imageUrl:
+        'https://images.unsplash.com/photo-1758875568468-194dfe762ba9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBmaXRuZXNzJTIwZXF1aXBtZW50fGVufDF8fHx8MTc3MzgwODExMHww&ixlib=rb-4.1.0&q=80&w=1080',
       label: 'BEST SELLERS',
-      category: 'Sports',
+      category: 'sports',
     },
   ];
 
   return (
     <div className="min-h-screen bg-[#eaeded]">
-      {/* Hero Banner */}
       <HeroBanner />
-      
-      {/* Category Cards - Properly positioned below banner */}
+
       <div className="relative px-8 py-12">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Shop by Category</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Shop by Category
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category, index) => (
               <CategoryCard
@@ -52,8 +56,7 @@ export function Home() {
           </div>
         </div>
       </div>
-      
-      {/* Additional Content Space */}
+
       <div className="px-8 pb-12">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
@@ -72,4 +75,4 @@ export function Home() {
       </div>
     </div>
   );
-}
+} 

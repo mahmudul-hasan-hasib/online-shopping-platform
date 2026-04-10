@@ -1,20 +1,87 @@
 import { ArrowLeft, ShoppingCart, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getProductById, getProducts } from '../../api/productApi';
+import type { Product } from '../../types/product';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
-
 
 export function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const product = products.find((p) => p.id === id);
+  useEffect(() => {
+    const loadProductDetails = async () => {
+      if (!id) {
+        setError('Invalid product ID');
+        setLoading(false);
+        return;
+      }
 
-  if (!product) {
+      try {
+        setLoading(true);
+        setError('');
+
+        const [foundProduct, allProducts] = await Promise.all([
+          getProductById(id),
+          getProducts(),
+        ]);
+
+        if (!foundProduct) {
+          setProduct(undefined);
+          setRelatedProducts([]);
+          return;
+        }
+
+        setProduct(foundProduct);
+
+        const related = allProducts
+          .filter(
+            (p) => p.category === foundProduct.category && p.id !== foundProduct.id
+          )
+          .slice(0, 4);
+
+        setRelatedProducts(related);
+      } catch (err) {
+        setError('Failed to load product details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProductDetails();
+  }, [id]);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    setIsAdding(true);
+
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+
+    setTimeout(() => setIsAdding(false), 500);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Loading product...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return (
       <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -32,22 +99,9 @@ export function ProductDetails() {
     );
   }
 
-  const handleAddToCart = () => {
-    setIsAdding(true);
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
-    setTimeout(() => setIsAdding(false), 500);
-  };
-
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
-
   return (
     <div className="min-h-screen bg-[#eaeded] py-8">
       <div className="max-w-7xl mx-auto px-8">
-        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
@@ -56,10 +110,8 @@ export function ProductDetails() {
           Back
         </button>
 
-        {/* Product Details */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Product Image */}
             <div>
               <img
                 src={product.imageUrl}
@@ -68,13 +120,11 @@ export function ProductDetails() {
               />
             </div>
 
-            {/* Product Info */}
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
                 {product.name}
               </h1>
 
-              {/* Rating */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
@@ -95,7 +145,6 @@ export function ProductDetails() {
 
               <hr className="my-4" />
 
-              {/* Price */}
               <div className="mb-6">
                 <span className="text-sm text-gray-600">Price:</span>
                 <div className="text-4xl font-bold text-red-600">
@@ -103,7 +152,6 @@ export function ProductDetails() {
                 </div>
               </div>
 
-              {/* Description */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold mb-2">About this item</h3>
                 <p className="text-gray-700">{product.description}</p>
@@ -111,11 +159,8 @@ export function ProductDetails() {
 
               <hr className="my-6" />
 
-              {/* Quantity Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-bold mb-2">
-                  Quantity:
-                </label>
+                <label className="block text-sm font-bold mb-2">Quantity:</label>
                 <select
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
@@ -129,7 +174,6 @@ export function ProductDetails() {
                 </select>
               </div>
 
-              {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
                 className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition flex items-center justify-center gap-3 ${
@@ -142,7 +186,6 @@ export function ProductDetails() {
                 {isAdding ? 'Added to Cart!' : 'Add to Cart'}
               </button>
 
-              {/* Buy Now Button */}
               <button
                 onClick={() => {
                   handleAddToCart();
@@ -156,7 +199,6 @@ export function ProductDetails() {
           </div>
         </div>
 
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">

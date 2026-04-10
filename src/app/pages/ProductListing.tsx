@@ -1,5 +1,5 @@
 import { SlidersHorizontal } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProducts } from '../../api/productApi';
 import type { Product } from '../../types/product';
@@ -9,37 +9,51 @@ export function ProductListing() {
   const { category } = useParams();
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState(category || '');
+  const [selectedCategory, setSelectedCategory] = useState(
+    category ? category.toLowerCase() : ''
+  );
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setSelectedCategory(category || '');
+    setSelectedCategory(category ? category.toLowerCase() : '');
   }, [category]);
 
- useEffect(() => {
-  const loadProducts = async () => {
-    const data = await getProducts();
-    setAllProducts(data);
-  };
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getProducts();
+        setAllProducts(data);
+      } catch (err) {
+        setError('Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadProducts();
-}, []);
+    loadProducts();
+  }, []);
 
-  const categories = [
-    'All',
-    ...Array.from(new Set(allProducts.map((p) => p.category))),
-  ];
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(allProducts.map((p) => p.category)))],
+    [allProducts]
+  );
 
-  const brands = Array.from(
-    new Set(allProducts.map((p) => p.name.split(' ')[0]))
-  ).slice(0, 8);
+  const brands = useMemo(
+    () =>
+      Array.from(new Set(allProducts.map((p) => p.name.split(' ')[0]))).slice(0, 8),
+    [allProducts]
+  );
 
   let filteredProducts = allProducts;
 
   if (selectedCategory && selectedCategory !== 'All') {
     filteredProducts = filteredProducts.filter(
-      (p) => p.category === selectedCategory
+      (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
     );
   }
 
@@ -64,6 +78,32 @@ export function ProductListing() {
     setSelectedBrands([]);
     setPriceRange([0, 2000]);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Loading products...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{error}</h2>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#eaeded]">
@@ -96,8 +136,7 @@ export function ProductListing() {
                         type="radio"
                         name="category"
                         checked={
-                          selectedCategory === cat ||
-                          (!selectedCategory && cat === 'All')
+                          (cat === 'All' && !selectedCategory) || selectedCategory === cat
                         }
                         onChange={() =>
                           setSelectedCategory(cat === 'All' ? '' : cat)
@@ -135,7 +174,9 @@ export function ProductListing() {
               <hr className="my-4" />
 
               <div className="mb-4">
-                <h3 className="font-bold text-sm text-gray-900 mb-3">Price Range</h3>
+                <h3 className="font-bold text-sm text-gray-900 mb-3">
+                  Price Range
+                </h3>
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs text-gray-600 block mb-1">

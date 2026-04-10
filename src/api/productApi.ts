@@ -13,9 +13,9 @@ export async function getProducts(): Promise<Product[]> {
   return response.json();
 }
 
-// 🔹 Get single product by SLUG (important 🔥)
-export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  const response = await fetch(`${BASE_URL}/${slug}/`);
+// 🔹 Get single product by ID
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const response = await fetch(`${BASE_URL}/${id}/`);
 
   if (!response.ok) {
     if (response.status === 404) return undefined;
@@ -30,7 +30,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
   const url =
     !category || category.toLowerCase() === 'all'
       ? `${BASE_URL}/`
-      : `${BASE_URL}/?category=${category}`;
+      : `${BASE_URL}/?category=${category.toLowerCase()}`;
 
   const response = await fetch(url);
 

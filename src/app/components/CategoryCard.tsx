@@ -7,13 +7,19 @@ interface CategoryCardProps {
   category: string;
 }
 
-export function CategoryCard({ title, imageUrl, label, category }: CategoryCardProps) {
+export function CategoryCard({
+  title,
+  imageUrl,
+  label,
+  category,
+}: CategoryCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-[400px] group cursor-pointer">
       <div className="p-5 flex flex-col h-full">
         <h3 className="text-xl font-bold mb-4 text-gray-900 group-hover:text-blue-600 transition">
           {title}
         </h3>
+
         <div className="relative mb-4 flex-1">
           <img
             src={imageUrl}
@@ -24,6 +30,7 @@ export function CategoryCard({ title, imageUrl, label, category }: CategoryCardP
             {label}
           </span>
         </div>
+
         <Link
           to={`/products/${category}`}
           className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium mt-auto block"
