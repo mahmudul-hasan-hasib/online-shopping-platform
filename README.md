@@ -33,30 +33,30 @@ This project demonstrates real-world backend architecture including authenticati
 - Order success page
 - Out-of-stock UI handling
 ---
-## 📸 Screenshots
+##  Screenshots
 
-### 🏠 Home Page
+###  Home Page
 ![Home](screenshots/home.png)
 
-### 🛍️ Product Listing
+###  Product Listing
 ![Products](screenshots/product-list.png)
 
-### 📄 Product Details
+###  Product Details
 ![Details](screenshots/product-details.png)
 
-### 🛒 Cart Page
+###  Cart Page
 ![Cart](screenshots/cart.png)
 
-### 💳 Checkout Page
+###  Checkout Page
 ![Checkout](screenshots/checkout.png)
 
-### ✅ Order Success
+###  Order Success
 ![Success](screenshots/order-success.png)
 
-### 📦 My Orders
+###  My Orders
 ![Orders](screenshots/orders.png)
 
-### 🔧 Admin Panel
+###  Admin Panel
 ![Admin](screenshots/admin.png)
 ---
 
