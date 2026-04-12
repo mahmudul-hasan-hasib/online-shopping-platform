@@ -12,9 +12,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
 
+  const isOutOfStock = product.stock <= 0;
+
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isOutOfStock) return;
 
     setIsAdding(true);
     addToCart(product);
@@ -31,8 +35,16 @@ export function ProductCard({ product }: ProductCardProps) {
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ${
+              isOutOfStock ? 'opacity-60' : ''
+            }`}
           />
+
+          {isOutOfStock && (
+            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded">
+              Out of Stock
+            </span>
+          )}
         </div>
 
         <h3 className="text-base font-semibold mb-2 text-gray-900 line-clamp-2 group-hover:text-blue-600 transition h-12">
@@ -55,22 +67,33 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className="text-sm text-gray-600">({product.reviews})</span>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-2">
           <span className="text-2xl font-bold text-gray-900">
             ${product.price.toFixed(2)}
           </span>
         </div>
 
+        <p
+          className={`text-sm font-semibold mb-3 ${
+            isOutOfStock ? 'text-red-600' : 'text-green-600'
+          }`}
+        >
+          {isOutOfStock ? 'Out of Stock' : `In Stock (${product.stock})`}
+        </p>
+
         <button
           onClick={handleAddToCart}
+          disabled={isOutOfStock}
           className={`w-full py-2.5 px-4 rounded-md font-bold transition flex items-center justify-center gap-2 mt-auto ${
-            isAdding
+            isOutOfStock
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : isAdding
               ? 'bg-green-500 text-white'
               : 'bg-orange-400 hover:bg-orange-500 text-gray-900'
           }`}
         >
           <ShoppingCart className="w-4 h-4" />
-          {isAdding ? 'Added!' : 'Add to Cart'}
+          {isOutOfStock ? 'Out of Stock' : isAdding ? 'Added!' : 'Add to Cart'}
         </button>
       </div>
     </Link>

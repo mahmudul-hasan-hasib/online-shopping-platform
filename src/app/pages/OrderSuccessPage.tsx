@@ -1,10 +1,10 @@
 import { CheckCircle2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export function OrderSuccessPage() {
   const navigate = useNavigate();
-
-  const mockOrderId = `ORD-${Date.now().toString().slice(-6)}`;
+  const location = useLocation();
+  const order = location.state?.order;
 
   return (
     <div className="min-h-screen bg-[#eaeded] flex items-center justify-center py-12 px-4">
@@ -25,16 +25,22 @@ export function OrderSuccessPage() {
           Your order has been confirmed and is now being processed.
         </p>
 
-        <div className="bg-gray-50 border rounded-lg p-4 mb-8">
-          <p className="text-sm text-gray-500 mb-1">Order ID</p>
-          <p className="text-xl font-bold text-gray-900">{mockOrderId}</p>
-        </div>
+        {order && (
+          <div className="bg-gray-50 border rounded-lg p-4 mb-8">
+            <p className="text-sm text-gray-500 mb-1">Order ID</p>
+            <p className="text-xl font-bold text-gray-900">{order.id}</p>
 
-        <div className="space-y-3 text-sm text-gray-600 mb-8">
-          <p>✔ A confirmation email will be sent soon.</p>
-          <p>✔ You will be able to track your order once shipping starts.</p>
-          <p>✔ Estimated delivery details will be available later.</p>
-        </div>
+            <p className="text-sm text-gray-500 mt-2">Total</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${order.total_amount}
+            </p>
+
+            <p className="text-sm text-gray-500 mt-2">Status</p>
+            <p className="text-md text-green-600 font-semibold">
+              {order.status}
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button

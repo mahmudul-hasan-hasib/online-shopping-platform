@@ -1,11 +1,50 @@
+# E-Commerce API + Frontend
 
-  # E-commerce Homepage Design
+A full-stack e-commerce project built with **Django REST Framework** for the backend and **React + Vite + TypeScript** for the frontend.
 
-  This is a code bundle for E-commerce Homepage Design. The original project is available at https://www.figma.com/design/OgG5dDddFp99fDqGuLcyPD/E-commerce-Homepage-Design.
+## Features
 
-  ## Running the code
+### Backend
+- Product listing API
+- Product detail API
+- Category-based filtering
+- JWT authentication
+- User registration and login
+- Checkout and order creation
+- Order items relation
+- My Orders API
+- Stock validation during checkout
+- Stock deduction after successful order
+- Django admin management
 
-  Run `npm i` to install the dependencies.
+### Frontend
+- Product listing page
+- Product details page
+- Cart page
+- Checkout page
+- Login and registration
+- Protected routes
+- Order success page
+- Out-of-stock handling
 
-  Run `npm run dev` to start the development server.
-  
+## Tech Stack
+
+### Backend
+- Python
+- Django
+- Django REST Framework
+- Simple JWT
+- SQLite / PostgreSQL
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+
+## Project Structure
+
+```bash
+backend/
+frontend/

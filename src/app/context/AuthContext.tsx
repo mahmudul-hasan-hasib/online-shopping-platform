@@ -5,52 +5,71 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { loginUser, registerUser } from '../../api/authApi';
+import { getMe, loginUser, registerUser } from '../../api/authApi';
 import type { LoginPayload, RegisterPayload, User } from '../../types/auth';
+import { clearAuthTokens, getAccessToken, saveAuthTokens } from '../../utils/auth';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  loading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 const AUTH_STORAGE_KEY = 'shop-user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
+    const initAuth = async () => {
+      const accessToken = getAccessToken();
 
-    if (!savedUser) return;
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
 
-    try {
-      setUser(JSON.parse(savedUser));
-    } catch (error) {
-      console.error('Failed to parse user from localStorage:', error);
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
+      try {
+        const userData = await getMe(accessToken);
+        setUser(userData);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+      } catch (error) {
+        console.error('Failed to restore auth session:', error);
+        clearAuthTokens();
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
   const login = async (payload: LoginPayload) => {
-    const loggedInUser = await loginUser(payload);
-    setUser(loggedInUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(loggedInUser));
+    const data = await loginUser(payload);
+
+    saveAuthTokens(data.access, data.refresh);
+
+    const userData = await getMe(data.access);
+
+    setUser(userData);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
   };
 
   const register = async (payload: RegisterPayload) => {
-    const newUser = await registerUser(payload);
-    setUser(newUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
+    await registerUser(payload);
   };
 
   const logout = () => {
-    setUser(null);
+    clearAuthTokens();
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    setUser(null);
   };
 
   return (
@@ -58,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isAuthenticated: !!user,
+        loading,
         login,
         register,
         logout,

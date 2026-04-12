@@ -19,6 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "description",
             "rating",
             "reviews",
+            "stock",
         ]
 
     def get_id(self, obj):

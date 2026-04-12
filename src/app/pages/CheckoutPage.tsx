@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { placeOrder } from '../../api/orderApi';
 import type { CheckoutFormData } from '../../types/order';
 import { useCart } from '../context/CartContext';
 
 export function CheckoutPage() {
   const navigate = useNavigate();
   const { cart, getCartTotal, clearCart } = useCart();
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     email: '',
@@ -13,10 +15,11 @@ export function CheckoutPage() {
     address: '',
     city: '',
     postalCode: '',
-    country: '',
+    country: 'Bangladesh',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const subtotal = getCartTotal();
   const shipping = 0;
@@ -36,21 +39,54 @@ export function CheckoutPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (cart.length === 0) return;
+    if (cart.length === 0) {
+      setSubmitError('Your cart is empty.');
+      return;
+    }
 
     setIsSubmitting(true);
+    setSubmitError('');
 
     try {
-      // Future:
-      // await createOrder({ items: cart, shippingAddress: formData })
+      const accessToken = localStorage.getItem('access_token');
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const payload = {
+        full_name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        postal_code: formData.postalCode,
+        country: formData.country || 'Bangladesh',
+        items: cart.map((item) => ({
+          product_id: Number(item.id),
+          quantity: item.quantity,
+        })),
+      };
+
+      const result = await placeOrder(payload, accessToken || undefined);
 
       clearCart();
-      navigate('/order-success');
-    } catch (error) {
+
+      navigate('/order-success', {
+        state: {
+          order: result.order,
+        },
+      });
+    } catch (error: any) {
       console.error('Failed to place order:', error);
-      alert('Something went wrong while placing the order.');
+
+      if (error?.items?.[0]) {
+        setSubmitError(error.items[0]);
+      } else if (error?.detail) {
+        setSubmitError(error.detail);
+      } else if (error?.message) {
+        setSubmitError(error.message);
+      } else if (typeof error === 'string') {
+        setSubmitError(error);
+      } else {
+        setSubmitError('Something went wrong while placing the order.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +119,6 @@ export function CheckoutPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Shipping Form */}
           <div className="lg:col-span-2">
             <form
               onSubmit={handlePlaceOrder}
@@ -92,6 +127,12 @@ export function CheckoutPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-6">
                 Shipping Information
               </h2>
+
+              {submitError && (
+                <div className="mb-4 rounded-md bg-red-100 text-red-700 px-4 py-3 text-sm font-medium">
+                  {submitError}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
@@ -220,7 +261,6 @@ export function CheckoutPage() {
             </form>
           </div>
 
-          {/* Right: Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -261,9 +301,7 @@ export function CheckoutPage() {
 
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span className="text-green-600 font-semibold">
-                    FREE
-                  </span>
+                  <span className="text-green-600 font-semibold">FREE</span>
                 </div>
 
                 <hr />
@@ -275,7 +313,7 @@ export function CheckoutPage() {
               </div>
 
               <p className="text-xs text-gray-500 mt-4">
-                This is a checkout skeleton. Payment integration will be added later.
+                Your order will be saved to the database after placing it.
               </p>
             </div>
           </div>

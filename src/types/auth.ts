@@ -1,16 +1,17 @@
 export interface User {
   id: string;
-  name: string;
+  username: string;
   email: string;
 }
 
 export interface LoginPayload {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface RegisterPayload {
-  name: string;
+  username: string;
   email: string;
   password: string;
+  confirm_password: string;
 }

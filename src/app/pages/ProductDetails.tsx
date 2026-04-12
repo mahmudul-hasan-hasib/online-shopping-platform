@@ -1,5 +1,5 @@
 import { ArrowLeft, ShoppingCart, Star } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProductById, getProducts } from '../../api/productApi';
 import type { Product } from '../../types/product';
@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 export function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
 
   const [product, setProduct] = useState<Product | undefined>(undefined);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -16,6 +16,7 @@ export function ProductDetails() {
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stockMessage, setStockMessage] = useState('');
 
   useEffect(() => {
     const loadProductDetails = async () => {
@@ -49,7 +50,7 @@ export function ProductDetails() {
           .slice(0, 4);
 
         setRelatedProducts(related);
-      } catch (err) {
+      } catch {
         setError('Failed to load product details');
       } finally {
         setLoading(false);
@@ -59,15 +60,40 @@ export function ProductDetails() {
     loadProductDetails();
   }, [id]);
 
+  const existingCartItem = useMemo(() => {
+    if (!product) return null;
+    return cart.find((item) => item.id === product.id) || null;
+  }, [cart, product]);
+
+  const alreadyInCart = existingCartItem?.quantity || 0;
+  const availableToAdd = product ? Math.max(product.stock - alreadyInCart, 0) : 0;
+  const isOutOfStock = !product || availableToAdd <= 0;
+
+  useEffect(() => {
+    if (availableToAdd <= 0) {
+      setQuantity(1);
+      return;
+    }
+
+    if (quantity > availableToAdd) {
+      setQuantity(availableToAdd);
+    }
+  }, [availableToAdd, quantity]);
+
   const handleAddToCart = () => {
     if (!product) return;
 
-    setIsAdding(true);
-
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
+    if (availableToAdd <= 0) {
+      setStockMessage('This product is already at maximum available quantity in your cart.');
+      return;
     }
 
+    const safeQuantity = Math.min(quantity, availableToAdd);
+
+    addToCart(product, safeQuantity);
+    setStockMessage('');
+
+    setIsAdding(true);
     setTimeout(() => setIsAdding(false), 500);
   };
 
@@ -99,6 +125,8 @@ export function ProductDetails() {
     );
   }
 
+  const maxSelectableQuantity = Math.min(availableToAdd, 10);
+
   return (
     <div className="min-h-screen bg-[#eaeded] py-8">
       <div className="max-w-7xl mx-auto px-8">
@@ -112,12 +140,19 @@ export function ProductDetails() {
 
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
+            <div className="relative">
               <img
                 src={product.imageUrl}
                 alt={product.name}
-                className="w-full h-[500px] object-cover rounded-lg"
+                className={`w-full h-[500px] object-cover rounded-lg ${
+                  isOutOfStock ? 'opacity-70' : ''
+                }`}
               />
+              {isOutOfStock && (
+                <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-4 py-2 rounded">
+                  Out of Stock
+                </span>
+              )}
             </div>
 
             <div>
@@ -145,12 +180,28 @@ export function ProductDetails() {
 
               <hr className="my-4" />
 
-              <div className="mb-6">
+              <div className="mb-3">
                 <span className="text-sm text-gray-600">Price:</span>
                 <div className="text-4xl font-bold text-red-600">
                   ${product.price.toFixed(2)}
                 </div>
               </div>
+
+              <p
+                className={`font-semibold mb-2 ${
+                  isOutOfStock ? 'text-red-600' : 'text-green-600'
+                }`}
+              >
+                {isOutOfStock
+                  ? 'Out of Stock'
+                  : `In Stock (${product.stock} total, ${availableToAdd} available to add)`}
+              </p>
+
+              {alreadyInCart > 0 && (
+                <p className="text-sm text-orange-600 font-medium mb-4">
+                  Already in cart: {alreadyInCart}
+                </p>
+              )}
 
               <div className="mb-6">
                 <h3 className="text-lg font-bold mb-2">About this item</h3>
@@ -162,38 +213,62 @@ export function ProductDetails() {
               <div className="mb-6">
                 <label className="block text-sm font-bold mb-2">Quantity:</label>
                 <select
-                  value={quantity}
+                  value={availableToAdd > 0 ? quantity : 1}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="border border-gray-300 rounded-md px-4 py-2 text-gray-900 cursor-pointer"
+                  disabled={isOutOfStock}
+                  className="border border-gray-300 rounded-md px-4 py-2 text-gray-900 cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
+                  {availableToAdd > 0 ? (
+                    [...Array(maxSelectableQuantity)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={1}>1</option>
+                  )}
                 </select>
               </div>
 
+              {stockMessage && (
+                <div className="mb-4 rounded-md bg-red-100 text-red-700 px-4 py-3 text-sm font-medium">
+                  {stockMessage}
+                </div>
+              )}
+
               <button
                 onClick={handleAddToCart}
+                disabled={isOutOfStock}
                 className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition flex items-center justify-center gap-3 ${
-                  isAdding
+                  isOutOfStock
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : isAdding
                     ? 'bg-green-500 text-white'
                     : 'bg-orange-400 hover:bg-orange-500 text-gray-900'
                 }`}
               >
                 <ShoppingCart className="w-6 h-6" />
-                {isAdding ? 'Added to Cart!' : 'Add to Cart'}
+                {isOutOfStock
+                  ? 'Out of Stock'
+                  : isAdding
+                  ? 'Added to Cart!'
+                  : 'Add to Cart'}
               </button>
 
               <button
                 onClick={() => {
+                  if (isOutOfStock) return;
                   handleAddToCart();
                   setTimeout(() => navigate('/cart'), 600);
                 }}
-                className="w-full mt-3 py-3 px-6 rounded-lg font-bold text-lg bg-yellow-400 hover:bg-yellow-500 text-gray-900 transition"
+                disabled={isOutOfStock}
+                className={`w-full mt-3 py-3 px-6 rounded-lg font-bold text-lg transition ${
+                  isOutOfStock
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
+                }`}
               >
-                Buy Now
+                {isOutOfStock ? 'Unavailable' : 'Buy Now'}
               </button>
             </div>
           </div>
@@ -205,25 +280,39 @@ export function ProductDetails() {
               Related Products
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((relatedProduct) => (
-                <div
-                  key={relatedProduct.id}
-                  onClick={() => navigate(`/product/${relatedProduct.id}`)}
-                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition cursor-pointer p-4"
-                >
-                  <img
-                    src={relatedProduct.imageUrl}
-                    alt={relatedProduct.name}
-                    className="w-full h-40 object-cover rounded-md mb-3"
-                  />
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {relatedProduct.name}
-                  </h3>
-                  <div className="text-lg font-bold text-gray-900">
-                    ${relatedProduct.price.toFixed(2)}
+              {relatedProducts.map((relatedProduct) => {
+                const relatedOutOfStock = relatedProduct.stock <= 0;
+
+                return (
+                  <div
+                    key={relatedProduct.id}
+                    onClick={() => navigate(`/product/${relatedProduct.id}`)}
+                    className="bg-white rounded-lg shadow-md hover:shadow-xl transition cursor-pointer p-4"
+                  >
+                    <div className="relative">
+                      <img
+                        src={relatedProduct.imageUrl}
+                        alt={relatedProduct.name}
+                        className={`w-full h-40 object-cover rounded-md mb-3 ${
+                          relatedOutOfStock ? 'opacity-60' : ''
+                        }`}
+                      />
+                      {relatedOutOfStock && (
+                        <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                          Out of Stock
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {relatedProduct.name}
+                    </h3>
+                    <div className="text-lg font-bold text-gray-900">
+                      ${relatedProduct.price.toFixed(2)}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

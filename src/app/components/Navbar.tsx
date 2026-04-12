@@ -1,13 +1,18 @@
 import { MapPin, Search, ShoppingCart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 export function Navbar() {
   const { getCartCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const cartCount = getCartCount();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <nav className="bg-[#131921] text-white">
@@ -35,11 +40,13 @@ export function Navbar() {
             <option>Home</option>
             <option>Sports</option>
           </select>
+
           <input
             type="text"
             placeholder="Search for products, brands and more..."
             className="flex-1 px-5 py-2.5 outline-none text-gray-900 text-sm placeholder:text-gray-500"
           />
+
           <button className="bg-orange-400 hover:bg-orange-500 px-6 py-2.5 rounded-r-md transition">
             <Search className="w-5 h-5 text-gray-900" />
           </button>
@@ -49,9 +56,11 @@ export function Navbar() {
           <div className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition">
             {isAuthenticated ? (
               <>
-                <span className="text-xs text-gray-300">Hello, {user?.name}</span>
+                <span className="text-xs text-gray-300">
+                  Hello, {user?.username}
+                </span>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="text-sm font-bold text-left"
                 >
                   Sign Out
@@ -68,7 +77,10 @@ export function Navbar() {
             )}
           </div>
 
-          <button className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition">
+          <button
+            onClick={() => navigate('/orders')}
+            className="flex flex-col items-start px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition"
+          >
             <span className="text-xs text-gray-300">Returns</span>
             <span className="text-sm font-bold">& Orders</span>
           </button>

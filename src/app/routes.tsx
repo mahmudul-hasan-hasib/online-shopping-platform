@@ -8,6 +8,8 @@ import { LoginPage } from './pages/LoginPage';
 import { OrderSuccessPage } from './pages/OrderSuccessPage';
 import { ProductDetails } from './pages/ProductDetails';
 import { ProductListing } from './pages/ProductListing';
+import { RegisterPage } from './pages/RegisterPage'; 
+import {OrdersPage } from './pages/OrdersPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +27,7 @@ export const router = createBrowserRouter([
           { path: 'cart', Component: CartPage },
           { path: 'checkout', Component: CheckoutPage },
           { path: 'order-success', Component: OrderSuccessPage },
+          { path: 'orders', Component: OrdersPage },
         ],
       },
     ],
@@ -32,5 +35,9 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     Component: LoginPage,
+  },
+  {
+    path: '/register', // ✅ THIS WAS MISSING
+    Component: RegisterPage,
   },
 ]);
