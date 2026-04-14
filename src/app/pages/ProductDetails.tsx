@@ -128,23 +128,23 @@ export function ProductDetails() {
   const maxSelectableQuantity = Math.min(availableToAdd, 10);
 
   return (
-    <div className="min-h-screen bg-[#eaeded] py-8">
-      <div className="max-w-7xl mx-auto px-8">
+    <div className="min-h-screen bg-[#eaeded] py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
           Back
         </button>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             <div className="relative">
               <img
                 src={product.imageUrl}
                 alt={product.name}
-                className={`w-full h-[500px] object-cover rounded-lg ${
+                className={`w-full h-[280px] sm:h-[350px] md:h-[450px] lg:h-[500px] object-cover rounded-lg ${
                   isOutOfStock ? 'opacity-70' : ''
                 }`}
               />
@@ -156,7 +156,7 @@ export function ProductDetails() {
             </div>
 
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                 {product.name}
               </h1>
 
@@ -182,7 +182,7 @@ export function ProductDetails() {
 
               <div className="mb-3">
                 <span className="text-sm text-gray-600">Price:</span>
-                <div className="text-4xl font-bold text-red-600">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-600">
                   ${product.price.toFixed(2)}
                 </div>
               </div>
@@ -203,7 +203,7 @@ export function ProductDetails() {
                 </p>
               )}
 
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <h3 className="text-lg font-bold mb-2">About this item</h3>
                 <p className="text-gray-700">{product.description}</p>
               </div>
@@ -216,7 +216,7 @@ export function ProductDetails() {
                   value={availableToAdd > 0 ? quantity : 1}
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   disabled={isOutOfStock}
-                  className="border border-gray-300 rounded-md px-4 py-2 text-gray-900 cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="border border-gray-300 rounded-md px-3 sm:px-4 py-2 text-gray-900 cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed w-full sm:w-auto"
                 >
                   {availableToAdd > 0 ? (
                     [...Array(maxSelectableQuantity)].map((_, i) => (
@@ -239,7 +239,7 @@ export function ProductDetails() {
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition flex items-center justify-center gap-3 ${
+                className={`w-full py-3 px-4 sm:px-6 rounded-lg font-bold text-base sm:text-lg transition flex items-center justify-center gap-2 sm:gap-3 ${
                   isOutOfStock
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : isAdding
@@ -262,7 +262,7 @@ export function ProductDetails() {
                   setTimeout(() => navigate('/cart'), 600);
                 }}
                 disabled={isOutOfStock}
-                className={`w-full mt-3 py-3 px-6 rounded-lg font-bold text-lg transition ${
+                className={`w-full mt-3 py-3 px-4 sm:px-6 rounded-lg font-bold text-base sm:text-lg ${
                   isOutOfStock
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
@@ -276,10 +276,10 @@ export function ProductDetails() {
 
         {relatedProducts.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
               Related Products
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => {
                 const relatedOutOfStock = relatedProduct.stock <= 0;
 

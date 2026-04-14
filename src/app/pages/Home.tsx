@@ -38,12 +38,13 @@ export function Home() {
     <div className="min-h-screen bg-[#eaeded]">
       <HeroBanner />
 
-      <div className="relative px-8 py-12">
+      <div className="relative px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
             Shop by Category
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {categories.map((category, index) => (
               <CategoryCard
                 key={index}
@@ -57,16 +58,16 @@ export function Home() {
         </div>
       </div>
 
-      <div className="px-8 pb-12">
+      <div className="px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Discover More Categories</h2>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-5 sm:p-8 text-center">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Discover More Categories</h2>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
               Browse through thousands of products across multiple categories
             </p>
             <Link
               to="/products"
-              className="inline-block bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
+              className="inline-block bg-orange-400 hover:bg-orange-500 text-white px-5 sm:px-6 py-3 rounded-md font-bold transition"
             >
               Explore All Products
             </Link>
@@ -75,4 +76,4 @@ export function Home() {
       </div>
     </div>
   );
-} 
+}

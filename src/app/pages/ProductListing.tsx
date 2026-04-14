@@ -1,12 +1,13 @@
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getProducts } from '../../api/productApi';
 import type { Product } from '../../types/product';
 import { ProductCard } from '../components/ProductCard';
 
 export function ProductListing() {
   const { category } = useParams();
+  const [searchParams] = useSearchParams();
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(
@@ -16,6 +17,9 @@ export function ProductListing() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const searchQuery = (searchParams.get('search') || '').toLowerCase().trim();
 
   useEffect(() => {
     setSelectedCategory(category ? category.toLowerCase() : '');
@@ -59,13 +63,23 @@ export function ProductListing() {
 
   if (selectedBrands.length > 0) {
     filteredProducts = filteredProducts.filter((p) =>
-      selectedBrands.some((brand) => p.name.includes(brand))
+      selectedBrands.some((brand) =>
+        p.name.toLowerCase().includes(brand.toLowerCase())
+      )
     );
   }
 
   filteredProducts = filteredProducts.filter(
     (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
   );
+
+  if (searchQuery) {
+    filteredProducts = filteredProducts.filter((p) =>
+      p.name.toLowerCase().includes(searchQuery) ||
+      p.category.toLowerCase().includes(searchQuery) ||
+      p.description.toLowerCase().includes(searchQuery)
+    );
+  }
 
   const handleBrandToggle = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -81,9 +95,11 @@ export function ProductListing() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Loading products...</h2>
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center px-4">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-12 text-center w-full max-w-lg">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Loading products...
+          </h2>
         </div>
       </div>
     );
@@ -91,12 +107,14 @@ export function ProductListing() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{error}</h2>
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center px-4">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-12 text-center w-full max-w-lg">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+            {error}
+          </h2>
           <button
             onClick={() => window.location.reload()}
-            className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
+            className="w-full sm:w-auto bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
           >
             Retry
           </button>
@@ -107,10 +125,14 @@ export function ProductListing() {
 
   return (
     <div className="min-h-screen bg-[#eaeded]">
-      <div className="max-w-[1920px] mx-auto px-8 py-8">
-        <div className="flex gap-6">
-          <aside className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <aside
+            className={`w-full lg:w-64 flex-shrink-0 ${
+              showFilters ? 'block' : 'hidden'
+            } lg:block`}
+          >
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-4">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-gray-700" />
@@ -136,11 +158,13 @@ export function ProductListing() {
                         type="radio"
                         name="category"
                         checked={
-                          (cat === 'All' && !selectedCategory) || selectedCategory === cat
+                          (cat === 'All' && !selectedCategory) ||
+                          selectedCategory.toLowerCase() === cat.toLowerCase()
                         }
-                        onChange={() =>
-                          setSelectedCategory(cat === 'All' ? '' : cat)
-                        }
+                        onChange={() => {
+                          setSelectedCategory(cat === 'All' ? '' : cat);
+                          if (window.innerWidth < 1024) setShowFilters(false);
+                        }}
                         className="w-4 h-4 text-orange-400 cursor-pointer"
                       />
                       <span>{cat}</span>
@@ -219,30 +243,42 @@ export function ProductListing() {
           </aside>
 
           <div className="flex-1">
+            <div className="lg:hidden mb-4">
+              <button
+                onClick={() => setShowFilters((prev) => !prev)}
+                className="w-full bg-white rounded-lg shadow-md px-4 py-3 flex items-center justify-center gap-2 font-bold text-gray-900"
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </button>
+            </div>
+
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {selectedCategory || 'All Products'}
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 capitalize">
+                {searchQuery
+                  ? `Search results for "${searchQuery}"`
+                  : selectedCategory || 'All Products'}
               </h1>
               <p className="text-gray-600">{filteredProducts.length} results</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
 
             {filteredProducts.length === 0 && (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <div className="bg-white rounded-lg shadow-md p-6 sm:p-12 text-center">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                   No products found
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-6 text-sm sm:text-base">
                   Try adjusting your filters or browse other categories
                 </p>
                 <button
                   onClick={clearFilters}
-                  className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
+                  className="w-full sm:w-auto bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-md font-bold transition"
                 >
                   Clear Filters
                 </button>

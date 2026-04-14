@@ -11,9 +11,9 @@ export function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center py-12">
-        <div className="bg-white rounded-lg shadow-md p-12 text-center max-w-md">
-          <ShoppingBag className="w-24 h-24 text-gray-400 mx-auto mb-6" />
+      <div className="min-h-screen bg-[#eaeded] flex items-center justify-center py-12 px-4">
+        <div className="bg-white rounded-lg shadow-md p-8 sm:p-12 text-center max-w-md w-full">
+          <ShoppingBag className="w-20 h-20 sm:w-24 sm:h-24 text-gray-400 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Your cart is empty
           </h2>
@@ -32,9 +32,9 @@ export function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#eaeded] py-8">
-      <div className="max-w-7xl mx-auto px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+    <div className="min-h-screen bg-[#eaeded] py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -45,20 +45,20 @@ export function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="p-6 border-b last:border-b-0 flex gap-4"
+                    className="p-4 sm:p-6 border-b last:border-b-0 flex flex-col sm:flex-row gap-4"
                   >
                     <img
                       src={item.imageUrl}
                       alt={item.name}
-                      className={`w-32 h-32 object-cover rounded-md cursor-pointer hover:opacity-80 transition ${
+                      className={`w-full sm:w-32 h-48 sm:h-32 object-cover rounded-md cursor-pointer hover:opacity-80 transition ${
                         isOutOfStock ? 'opacity-60' : ''
                       }`}
                       onClick={() => navigate(`/product/${item.id}`)}
                     />
 
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h3
-                        className="text-lg font-bold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition"
+                        className="text-base sm:text-lg font-bold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition break-words"
                         onClick={() => navigate(`/product/${item.id}`)}
                       >
                         {item.name}
@@ -82,18 +82,18 @@ export function CartPage() {
                           : `In Stock (${item.stock} available)`}
                       </p>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                         <div className="flex items-center border border-gray-300 rounded-md">
                           <button
                             onClick={() =>
                               updateQuantity(item.id, item.quantity - 1)
                             }
-                            className="px-3 py-1 hover:bg-gray-100 transition"
+                            className="px-3 py-2 hover:bg-gray-100 transition"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
 
-                          <span className="px-4 py-1 border-x border-gray-300">
+                          <span className="px-4 py-2 border-x border-gray-300 min-w-[48px] text-center">
                             {item.quantity}
                           </span>
 
@@ -105,7 +105,7 @@ export function CartPage() {
                               )
                             }
                             disabled={isOutOfStock || item.quantity >= item.stock}
-                            className="px-3 py-1 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -127,7 +127,7 @@ export function CartPage() {
                       )}
                     </div>
 
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <div className="text-lg font-bold text-gray-900">
                         ${(item.price * item.quantity).toFixed(2)}
                       </div>
@@ -139,27 +139,27 @@ export function CartPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-4">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 Order Summary
               </h2>
 
               <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-gray-700 gap-4">
                   <span>
                     Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)
                   </span>
                   <span>${total.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-gray-700 gap-4">
                   <span>Shipping</span>
                   <span className="text-green-600 font-semibold">FREE</span>
                 </div>
 
                 <hr />
 
-                <div className="flex justify-between text-xl font-bold text-gray-900">
+                <div className="flex justify-between text-lg sm:text-xl font-bold text-gray-900 gap-4">
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>

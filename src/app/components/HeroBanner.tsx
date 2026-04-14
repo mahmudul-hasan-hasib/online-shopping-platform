@@ -53,15 +53,13 @@ export function HeroBanner() {
     setCurrentSlide(index);
   };
 
-  // Auto-advance slides every 5 seconds
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="relative w-full h-[450px] overflow-hidden bg-gray-900">
-      {/* Slides */}
+    <div className="relative w-full h-[260px] sm:h-[320px] md:h-[400px] lg:h-[450px] overflow-hidden bg-gray-900">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -69,14 +67,17 @@ export function HeroBanner() {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {/* Hero Content */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-white px-8">
-              <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{slide.title}</h1>
-              <p className="text-xl mb-6 drop-shadow-md">{slide.subtitle}</p>
+            <div className="text-center text-white px-4 sm:px-8 max-w-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 md:mb-4 drop-shadow-lg">
+                {slide.title}
+              </h1>
+              <p className="text-sm sm:text-base md:text-xl mb-4 md:mb-6 drop-shadow-md">
+                {slide.subtitle}
+              </p>
               <Link
                 to={slide.link}
-                className="inline-block bg-white text-gray-900 px-8 py-3 rounded-md font-bold hover:bg-gray-100 transition shadow-lg"
+                className="inline-block bg-white text-gray-900 px-5 sm:px-6 md:px-8 py-2.5 md:py-3 rounded-md font-bold hover:bg-gray-100 transition shadow-lg text-sm sm:text-base"
               >
                 {slide.buttonText}
               </Link>
@@ -85,29 +86,26 @@ export function HeroBanner() {
         </div>
       ))}
 
-      {/* Left Arrow */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-sm shadow-lg transition z-10"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 sm:p-2 rounded-sm shadow-lg transition z-10"
       >
-        <ChevronLeft className="w-8 h-8 text-gray-900" />
+        <ChevronLeft className="w-5 h-5 sm:w-8 sm:h-8 text-gray-900" />
       </button>
 
-      {/* Right Arrow */}
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-sm shadow-lg transition z-10"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 sm:p-2 rounded-sm shadow-lg transition z-10"
       >
-        <ChevronRight className="w-8 h-8 text-gray-900" />
+        <ChevronRight className="w-5 h-5 sm:w-8 sm:h-8 text-gray-900" />
       </button>
 
-      {/* Pagination Dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition ${
+            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition ${
               index === currentSlide
                 ? 'bg-white scale-110'
                 : 'bg-white/50 hover:bg-white/75'
