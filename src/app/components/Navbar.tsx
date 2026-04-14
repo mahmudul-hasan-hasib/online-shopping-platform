@@ -32,11 +32,21 @@ export function Navbar() {
     <nav className="bg-[#131921] text-white">
       <div className="px-3 sm:px-4 lg:px-6 py-3">
         <div className="flex flex-wrap items-center gap-3">
-          <Link to="/" className="flex items-center shrink-0">
-            <div className="text-lg sm:text-2xl font-bold px-2 sm:px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition">
-              <span className="text-white">shop</span>
-              <span className="text-orange-400">.com</span>
-            </div>
+          <Link to="/" className="flex items-center gap-1 shrink-0">
+            <div className="px-2 sm:px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition flex items-center">
+    
+            {/* Special R */}
+            <span className="text-3xl sm:text-4xl font-black italic leading-none mr-0.5 bg-gradient-to-r from-blue-700 to-indigo-500 bg-clip-text text-transparent">
+              R
+            </span>
+
+            {/* Rest text */}
+            <span className="text-2xl sm:text-3xl font-extrabold italic tracking-tight          leading-none">
+              <span className="text-[#1e3a8a]">auf</span>
+              <span className="text-[#f97316]">unify</span>
+            </span>
+
+          </div>
           </Link>
 
           <button className="hidden md:flex items-center gap-1 px-3 py-2 hover:outline outline-1 outline-white rounded-sm transition shrink-0">
