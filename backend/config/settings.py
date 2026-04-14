@@ -153,3 +153,15 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ],
 }
+
+# 🔥 TEMP: auto create admin (remove after use)
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+# used due to forgetting the admin credentials during development, should be removed in production
+if not User.objects.filter(username="admin").exists():
+    User.objects.create_superuser(
+        username="hasib",
+        email="hasib@gmail.com",
+        password="admin123"
+    )
